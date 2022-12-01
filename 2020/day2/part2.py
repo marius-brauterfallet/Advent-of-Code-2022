@@ -7,7 +7,7 @@ def main():
 
         low, high = [int(x) for x in counts.split("-")]
 
-        if low <= pwd.count(letter[0]) <= high:
+        if len(pwd) > high + 1 and pwd[low + 1] == letter[0] and pwd[high + 1] != letter[0]:
             valids += 1
 
     f.close()
