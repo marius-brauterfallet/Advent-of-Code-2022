@@ -4,10 +4,11 @@ def main():
 
     for line in f:
         counts, letter, pwd = line.strip().split()
+        letter = letter[0]
 
-        low, high = [int(x) for x in counts.split("-")]
+        low, high = [int(x) - 1 for x in counts.split("-")]
 
-        if len(pwd) > high + 1 and pwd[low + 1] == letter[0] and pwd[high + 1] != letter[0]:
+        if (pwd[low] == letter) != (pwd[high] == letter):
             valids += 1
 
     f.close()
