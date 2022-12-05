@@ -1,3 +1,6 @@
+CFLAGS = -g -Wall -Wextra
+VFLAGS = --leak-check=full
+
 all: part1 part2
 
 part1: part1.c
@@ -13,10 +16,10 @@ run2: part2
 	./part2
 
 check1: part1
-	valgrind ./part1
+	valgrind $(VFLAGS) ./part1
 
 check2: part2
-	vlagrind ./part2
+	vlagrind $(VFLAGS) ./part2
 
 clean:
 	rm -f part1 part2
