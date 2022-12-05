@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 
 typedef struct node {
@@ -7,46 +9,50 @@ typedef struct node {
 } node;
 
 node* make_node(char c);
-void free_stacks(node stacks[], int size);
-void free_nodes(node* n) {
-void add_node(node stacks[], int i, char c);
-void print_res(node stacks[], int size) {
+void free_stacks(node* stacks[], int size);
+void free_nodes(node* n);
+void add_node(node* stacks[], int i, char c);
+void add_node_top(node* stacks[], int i, char c);
+void print_res(node* stacks[], int size);
+void move(node* stacks[], int from, int to, int amount);
+void single_move(node* stacks[], int from, int to);
 
 int main() {
     FILE *fp;
     size_t n = 0;
     ssize_t rc;
     char *s = NULL;
-
-    int i;
-    node stacks[9] = {0};
+    int i, amount, from, to;
+    node* stacks[9] = {0};
 
     fp = fopen("input", "r");
 
-    while (rc = getline(&s, &n, fp) != -1) {
+    do {
+        rc = getline(&s, &n, fp);
+
         if (isdigit(s[1])) {
             rc = getline(&s, &n, fp);
             break;
         }
 
-        i = 1;
-
-        while (i < rc) {
+        for (i = 1; i < rc; i += 4) {
             if (isalpha(s[i])) {
-                add_node(stacks, i / 4, s[i])
+                add_node_top(stacks, i / 4, s[i]);
             }
-
-            i += 4;
         }
+    } while (rc != -1);
+
+    
+    while ((rc = fscanf(fp, "move %d from %d to %d\n", &amount, &from, &to)) != -1) {
+        move(stacks, from - 1, to - 1, amount);
     }
 
-    printf("%s", s);
     print_res(stacks, 9);
 
 
-
-
     fclose(fp);
+    free_stacks(stacks, 9);
+    free(s);
 }
 
 
@@ -59,7 +65,7 @@ node* make_node(char c) {
 }
 
 
-void free_stacks(node stacks[], int size) {
+void free_stacks(node* stacks[], int size) {
     int i;
 
     for (i = 0; i < size; i++) {
@@ -76,7 +82,7 @@ void free_nodes(node* n) {
 }
 
 
-void add_node(node stacks[], int i, char c) {
+void add_node(node* stacks[], int i, char c) {
     node* n = malloc(sizeof(node));
 
     n->c = c;
@@ -85,9 +91,28 @@ void add_node(node stacks[], int i, char c) {
 }
 
 
-void print_res(node stacks[], int size) {
+void add_node_top(node* stacks[], int i, char c) {
+    node *current;
+    
+    if (stacks[i]) {
+        current = stacks[i];
+
+        while (current->next) {
+            current = current->next;
+        }
+
+        current->next = make_node(c);
+        return;
+    }
+
+    stacks[i] = make_node(c);
+}
+
+
+void print_res(node* stacks[], int size) {
     int i, j = 0;
-    char buf[10]:
+    char buf[10];
+
     for (i = 0; i < size; i++) {
         if (stacks[i]) {
             buf[j] = stacks[i]->c;
@@ -97,4 +122,23 @@ void print_res(node stacks[], int size) {
 
     buf[j] = '\0';
     printf("%s\n", buf);
+}
+
+
+void move(node* stacks[], int from, int to, int amount) {
+    int i;
+
+    for (i = 0; i < amount; i++) {
+        single_move(stacks, from, to);
+    }
+}
+
+
+void single_move(node* stacks[], int from, int to) {
+    node* n = stacks[from];
+
+    stacks[from] = stacks[from]->next;
+
+    n->next = stacks[to];
+    stacks[to] = n;
 }
